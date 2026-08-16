@@ -1,0 +1,57 @@
+# Secrets
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.sql.gz
+
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Build outputs
+dist/
+build/
+.next/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker runtime
+data/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+
+# Large binaries
+*.tar.gz
+*.zip
+
+# Misc
+.opencode-*
+.claude/
+
+
+# Redundant backups
+frontend/.backup-*/

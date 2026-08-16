@@ -1,0 +1,15 @@
+vendor
+node_modules
+.env
+.env.local
+.env.production
+*.log
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+database/database.sqlite
+*.sqlite
+.git
+.idea
+.vscode

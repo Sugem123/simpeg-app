@@ -1,0 +1,103 @@
+services:
+  simpeg-db:
+    image: postgres:16-alpine
+    container_name: simpeg-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-simpeg}
+      POSTGRES_USER: ${DB_USERNAME:-simpeg}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-REPLACE_ME}
+    volumes:
+      - simpeg_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-simpeg}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - simpeg-internal
+
+  simpeg-redis:
+    image: redis:7-alpine
+    container_name: simpeg-redis
+    restart: unless-stopped
+    volumes:
+      - simpeg_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - simpeg-internal
+
+  simpeg-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: simpeg-backend
+    restart: unless-stopped
+    ports:
+      - "8096:8000"
+    depends_on:
+      simpeg-db:
+        condition: service_healthy
+      simpeg-redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: ${BACKEND_URL:-https://api-simpeg.sman1prambon.my.id}
+      APP_KEY: ${APP_KEY}
+      DB_CONNECTION: pgsql
+      DB_HOST: simpeg-db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-simpeg}
+      DB_USERNAME: ${DB_USERNAME:-simpeg}
+      DB_PASSWORD: ${DB_PASSWORD:-REPLACE_ME}
+      CACHE_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: simpeg-redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      EMASTER_USERNAME: ${EMASTER_USERNAME}
+      EMASTER_PASSWORD: ${EMASTER_PASSWORD}
+      EMASTER_TOTP_SECRET: ${EMASTER_TOTP_SECRET}
+      CORS_ALLOWED_ORIGINS: ${FRONTEND_URL:-https://simpeg.sman1prambon.my.id}
+    volumes:
+      - simpeg_storage:/var/www/html/storage/app/public
+    networks:
+      - simpeg-internal
+      - coolify
+
+  simpeg-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_INTERNAL_URL: http://simpeg-backend:8000
+    container_name: simpeg-frontend
+    restart: unless-stopped
+    ports:
+      - "8097:3000"
+    depends_on:
+      - simpeg-backend
+    environment:
+      BACKEND_INTERNAL_URL: http://simpeg-backend:8000
+      NEXT_PUBLIC_APP_NAME: SIMPEG
+    networks:
+      - simpeg-internal
+      - coolify
+
+volumes:
+  simpeg_db_data:
+  simpeg_redis_data:
+  simpeg_storage:
+
+networks:
+  simpeg-internal:
+    name: simpeg-internal
+  coolify:
+    external: true
+    name: coolify
