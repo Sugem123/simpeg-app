@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_DB: simpeg
       POSTGRES_USER: simpeg
-      POSTGRES_PASSWORD: REPLACE_ME
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-simpeg_local_dev}
     ports:
       - "5432:5432"
     volumes:
@@ -56,7 +56,7 @@ services:
       DB_PORT: 5432
       DB_DATABASE: simpeg
       DB_USERNAME: simpeg
-      DB_PASSWORD: REPLACE_ME
+      DB_PASSWORD: ${DB_PASSWORD:-simpeg_local_dev}
       CACHE_DRIVER: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
