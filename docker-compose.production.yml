@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_DATABASE:-simpeg}
       POSTGRES_USER: ${DB_USERNAME:-simpeg}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-REPLACE_ME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD wajib diisi}
     volumes:
       - simpeg_db_data:/var/lib/postgresql/data
     healthcheck:
@@ -54,7 +54,7 @@ services:
       DB_PORT: 5432
       DB_DATABASE: ${DB_DATABASE:-simpeg}
       DB_USERNAME: ${DB_USERNAME:-simpeg}
-      DB_PASSWORD: ${DB_PASSWORD:-REPLACE_ME}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD wajib diisi}
       CACHE_DRIVER: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
